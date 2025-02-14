@@ -91,9 +91,9 @@
                 download: true,
                 header: true,
                 complete: function(results) {
-                    let tabella = "<table><thead><tr><th>Corso d'Acqua</th><th>Portata Media [m³/s]</th><th>Posizione</th></tr></thead><tbody>";
+                    let tabella = "<table><thead><tr><th>Sezione</th><th>Portata [m³/s]</th><th>Posizione</th></tr></thead><tbody>";
                     results.data.forEach(function(row, index) {
-                        tabella += "<tr><td>" + row['Corso d\'Acqua'] + "</td><td>" + row['Portata Media'] + "</td><td><div class='circle'>" + (index + 1) + "</div></td></tr>";
+                        tabella += "<tr><td>" + row['Sezione'] + "</td><td>" + row['Portata'] + "</td><td><div class='circle'>" + (index + 1) + "</div></td></tr>";
                     });
                     tabella += "</tbody></table>";
                     document.getElementById('tabella-dati').innerHTML = tabella;
