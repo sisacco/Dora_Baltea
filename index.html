@@ -1,68 +1,93 @@
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoraggio Prelievi Fluviali</title>
+    <title>Monitoraggio Settimanale - Dora Baltea</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding: 20px;
         }
         .container {
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h2 {
+            color: #007BFF;
+        }
+        .map-container {
             display: flex;
             align-items: flex-start;
             justify-content: space-between;
-            max-width: 1000px;
             width: 100%;
+            margin-bottom: 20px;
         }
-        .text-section {
-            width: 50%;
+        #map {
+            width: 80%;
+            height: 400px;
+            border-radius: 10px;
         }
-        .diagram {
-            width: 50%;
-            text-align: center;
+        .legend {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+            font-size: 14px;
+            line-height: 18px;
+            color: #333;
+            width: 180px;
+            margin-left: 10px;
         }
-        .diagram img {
-            width: 100%;
-            max-width: 400px;
-        }
-        .data-box {
+        .legend div {
             display: flex;
             align-items: center;
-            margin: 10px 0;
+            margin-bottom: 5px;
         }
-        .number {
-            font-size: 20px;
-            font-weight: bold;
-            background-color: #007BFF;
-            color: white;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 50%;
+        .legend span {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
             margin-right: 10px;
-        }
-        .value {
-            font-size: 18px;
-            font-weight: bold;
+            border-radius: 50%;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
-        table, th, td {
-            border: 1px solid black;
-        }
         th, td {
-            padding: 10px;
+            border: 1px solid #ddd;
+            padding: 12px;
             text-align: left;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
         }
         .btn-download {
             background-color: #007BFF;
@@ -78,87 +103,84 @@
             background-color: #0056b3;
         }
     </style>
-    <script>
-        function aggiornaData() {
-            let oggi = new Date();
-            oggi.setDate(oggi.getDate() - 1); // Data di ieri
-            let dataFormattata = oggi.toLocaleDateString('it-IT', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric'
-            });
-            document.getElementById("data-aggiornamento").textContent = dataFormattata;
-        }
-
-        function caricaCSV() {
-            fetch('data.csv')
-                .then(response => response.text())
-                .then(data => {
-                    let lines = data.split('\n').filter(line => line.trim() !== ''); // Remove empty lines
-                    if (lines.length > 0) {
-                        let table = '<table><tr>';
-                        let headers = lines[0].split(',');
-                        for (let header of headers) {
-                            table += '<th>' + header.trim() + '</th>';
-                        }
-                        table += '</tr>';
-                        for (let i = 1; i < lines.length; i++) {
-                            let cells = lines[i].split(',');
-                            table += '<tr>';
-                            for (let cell of cells) {
-                                table += '<td>' + cell.trim() + '</td>';
-                            }
-                            table += '</tr>';
-                        }
-                        table += '</table>';
-                        document.getElementById('csv-table').innerHTML = table;
-                    }
-                })
-                .catch(error => console.error('Error fetching the CSV file:', error));
-        }
-
-        function scaricaTabella() {
-            fetch('data.csv')
-                .then(response => response.blob())
-                .then(blob => {
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.style.display = 'none';
-                    a.href = url;
-                    a.download = 'data.csv';
-                    document.body.appendChild(a);
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                })
-                .catch(error => console.error('Error downloading the CSV file:', error));
-        }
-
-        window.onload = function() {
-            aggiornaData();
-            caricaCSV();
-        };
-    </script>
 </head>
 <body>
-    <h2>Monitoraggio Prelievi Fluviali - Dati del <span id="data-aggiornamento"></span></h2>
     <div class="container">
-        <div class="text-section">
-            <p>La pagina consente la consultazione della situazione delle portate e dei prelievi idrici lungo l'asta fluviale.</p>
-            <h3>Dati misurati</h3>
-            <div class="data-box"><div class="number">1</div> <div class="value">Portata in alveo Tavagnasco: 44,5</div></div>
-            <div class="data-box"><div class="number">2</div> <div class="value">Prelievo Montestrutto: -</div></div>
-            <div class="data-box"><div class="number">3</div> <div class="value">Prelievo Naviglio d'Ivrea: -</div></div>
-            <div class="data-box"><div class="number">4</div> <div class="value">Portata in alveo Ponte di Strambino: -</div></div>
-            <div class="data-box"><div class="number">5</div> <div class="value">Prelievo De Pretis: -</div></div>
-            <div class="data-box"><div class="number">6</div> <div class="value">Prelievo Canale Farini: -</div></div>
-            <div class="data-box"><div class="number">7</div> <div class="value">Portata in scaricatore Farini: -</div></div>
-            <div class="data-box"><div class="number">8</div> <div class="value">Portata in alveo Verolengo: 39,5</div></div>
+        <h2>Monitoraggio Settimanale - Dora Baltea</h2>
+        <p>Tabella aggiornata ogni settimana con le ultime misurazioni.</p>
+        
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="legend">
+                <div><span style="background: blue;"></span> Portata in alveo</div>
+                <div><span style="background: green;"></span> Deflusso ecologico</div>
+                <div><span style="background: red;"></span> Prelievo</div>
+            </div>
         </div>
-        <div class="diagram">
-            <img src="Schema Dora.png" alt="Schema Prelievi">
-        </div>
+        
+        <table id="tabella-dati" class="display">
+            <thead>
+                <tr>
+                    <th>Sezione</th>
+                    <th>Portata Media [m³/s]</th>
+                    <th>Tipo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- I dati verranno caricati dinamicamente -->
+            </tbody>
+        </table>
+        <button class="btn-download" onclick="scaricaTabella()">Scarica CSV</button>
     </div>
-    <div id="csv-table"></div>
-    <button class="btn-download" onclick="scaricaTabella()">Scarica CSV</button>
+    
+    <!-- jQuery, DataTables e Leaflet -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    
+    <script>
+        var map = L.map('map').setView([45.5, 7.8], 9);
+        L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: '© Google Maps'
+        }).addTo(map);
+        
+        var iconBlue = L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png', iconSize: [25, 41], iconAnchor: [12, 41] });
+        var iconGreen = L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png', iconSize: [25, 41], iconAnchor: [12, 41] });
+        var iconRed = L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png', iconSize: [25, 41], iconAnchor: [12, 41] });
+        
+        var points = [
+           { name: "Tavagnasco", lat: 45.54793, lon: 7.82633, type: "portata in alveo" },
+            { name: "Verolengo", lat: 45.19199, lon: 8.040914, type: "portata in alveo" },
+            { name: "Scaricatore Farini", lat: 45.2208, lon: 8.009, type: "deflusso ecologico" },
+            { name: "Canale Depretis - Prelievo irriguo", lat: 45.2533, lon: 7.9983, type: "prelievo" }
+        ];
+        
+        points.forEach(point => {
+            var icon = point.type === "portata in alveo" ? iconBlue : point.type === "deflusso ecologico" ? iconGreen : iconRed;
+            L.marker([point.lat, point.lon], { icon: icon }).addTo(map).bindPopup(`<b>${point.name}</b><br>Tipo: ${point.type}`);
+        });
+
+
+
+$(document).ready(function() {
+            caricaTabella();
+        });
+        
+        function caricaTabella() {
+            $.get('data.csv', function(csvData) {
+                let rows = csvData.split("\n");
+                let tbody = "";
+                for (let i = 1; i < rows.length; i++) {
+                    let cols = rows[i].split(",");
+                    if (cols.length >= 2) {
+                        tbody += `<tr><td>${cols[0]}</td><td>${cols[1]}</td><td><div class='circle'>${i}</div></td></tr>`;
+                    }
+                }
+                $("#tabella-dati tbody").html(tbody);
+                $("#tabella-dati").DataTable();
+            });
+        }
+    </script>
 </body>
 </html>
