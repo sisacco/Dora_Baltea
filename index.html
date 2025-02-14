@@ -179,24 +179,7 @@ $(document).ready(function() {
                 $("#tabella-dati tbody").html(tbody);
                 $("#tabella-dati").DataTable();
             });
-        <button class="btn-download" onclick="scaricaTabella()">Scarica CSV</button>
-
-<script>
-    function scaricaTabella() {
-        fetch('data.csv')
-            .then(response => response.blob())
-            .then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = 'data.csv';
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-            })
-            .catch(error => console.error('Error downloading the CSV file:', error));
-    }
-</script>
+        }
+    </script>
 </body>
 </html>
