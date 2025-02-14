@@ -91,6 +91,7 @@ function caricaTabella() {
         header: true,
         delimiter: ";",  // Specifica il delimitatore corretto
         complete: function(results) {
+            console.log(results.data); // Aggiungi questo per vedere i dati caricati
             if (results.errors.length) {
                 console.error('Error parsing CSV:', results.errors);
                 return;
@@ -111,6 +112,11 @@ function caricaTabella() {
         }
     });
 }
+
+window.onload = function() {
+    aggiornaData();
+    caricaTabella();
+};
         
      
 }
