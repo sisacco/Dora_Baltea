@@ -85,11 +85,11 @@
             });
             document.getElementById("data-aggiornamento").textContent = dataFormattata;
         }
-
-        function caricaTabella() {
+function caricaTabella() {
     Papa.parse('data.csv', {
         download: true,
         header: true,
+        delimiter: ";",  // Specifica il delimitatore corretto
         complete: function(results) {
             if (results.errors.length) {
                 console.error('Error parsing CSV:', results.errors);
@@ -110,6 +110,9 @@
             console.error('Error fetching CSV:', err);
         }
     });
+}
+        
+     
 }
 
         window.onload = function() {
