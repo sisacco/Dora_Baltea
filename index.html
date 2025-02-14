@@ -85,41 +85,34 @@
             });
             document.getElementById("data-aggiornamento").textContent = dataFormattata;
         }
-function caricaTabella() {
-    Papa.parse('data.csv', {
-        download: true,
-        header: true,
-        delimiter: ";",  // Specifica il delimitatore corretto
-        complete: function(results) {
-            console.log(results.data); // Aggiungi questo per vedere i dati caricati
-            if (results.errors.length) {
-                console.error('Error parsing CSV:', results.errors);
-                return;
-            }
-            let tabella = "<table><thead><tr><th>Sezione</th><th>Portata [m³/s]</th><th>Posizione</th></tr></thead><tbody>";
-            results.data.forEach(function(row, index) {
-                if (row['Sezione'] && row['Portata']) {
-                    tabella += "<tr><td>" + row['Sezione'] + "</td><td>" + row['Portata'] + "</td><td><div class='circle'>" + (index + 1) + "</div></td></tr>";
-                } else {
-                    console.error('Missing data in row:', row);
+
+        function caricaTabella() {
+            Papa.parse('data.csv', {
+                download: true,
+                header: true,
+                delimiter: ";",  // Specifica il delimitatore corretto
+                complete: function(results) {
+                    console.log(results.data); // Aggiungi questo per vedere i dati caricati
+                    if (results.errors.length) {
+                        console.error('Error parsing CSV:', results.errors);
+                        return;
+                    }
+                    let tabella = "<table><thead><tr><th>Sezione</th><th>Portata [m³/s]</th><th>Posizione</th></tr></thead><tbody>";
+                    results.data.forEach(function(row, index) {
+                        if (row['Sezione'] && row['Portata']) {
+                            tabella += "<tr><td>" + row['Sezione'] + "</td><td>" + row['Portata'] + "</td><td><div class='circle'>" + (index + 1) + "</div></td></tr>";
+                        } else {
+                            console.error('Missing data in row:', row);
+                        }
+                    });
+                    tabella += "</tbody></table>";
+                    document.getElementById('tabella-dati').innerHTML = tabella;
+                },
+                error: function(err) {
+                    console.error('Error fetching CSV:', err);
                 }
             });
-            tabella += "</tbody></table>";
-            document.getElementById('tabella-dati').innerHTML = tabella;
-        },
-        error: function(err) {
-            console.error('Error fetching CSV:', err);
         }
-    });
-}
-
-window.onload = function() {
-    aggiornaData();
-    caricaTabella();
-};
-        
-     
-}
 
         window.onload = function() {
             aggiornaData();
