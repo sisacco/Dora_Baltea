@@ -64,6 +64,19 @@
             padding: 10px;
             text-align: left;
         }
+        .btn-download {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .btn-download:hover {
+            background-color: #0056b3;
+        }
     </style>
     <script>
         function aggiornaData() {
@@ -104,6 +117,22 @@
                 .catch(error => console.error('Error fetching the CSV file:', error));
         }
 
+        function scaricaTabella() {
+            fetch('data.csv')
+                .then(response => response.blob())
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = 'data.csv';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                })
+                .catch(error => console.error('Error downloading the CSV file:', error));
+        }
+
         window.onload = function() {
             aggiornaData();
             caricaCSV();
@@ -130,5 +159,6 @@
         </div>
     </div>
     <div id="csv-table"></div>
+    <button class="btn-download" onclick="scaricaTabella()">Scarica CSV</button>
 </body>
 </html>
