@@ -98,8 +98,8 @@
                     }
                     let tabella = "<table><thead><tr><th>Sezione</th><th>Portata [m³/s]</th><th>Posizione</th></tr></thead><tbody>";
                     results.data.forEach(function(row, index) {
-                        if (row['Sezione'] && row['Portata media']) {
-                            tabella += "<tr><td>" + row['Sezione'] + "</td><td>" + row['Portata'] + "</td><td><div class='circle'>" + (index + 1) + "</div></td></tr>";
+                        if (row['Sezione'] && row['Portata Media']) {
+                            tabella += "<tr><td>" + row['Sezione'] + "</td><td>" + row['Portata Media'] + "</td><td><div class='circle'>" + (index + 1) + "</div></td></tr>";
                         } else {
                             console.error('Missing data in row:', row);
                         }
