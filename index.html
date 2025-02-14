@@ -1,3 +1,6 @@
+To display the CSV data in a table on your web page, you can use JavaScript to fetch the CSV file and create an HTML table. Here is an updated version of your `index.html` file with the necessary code:
+
+```html
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -52,6 +55,18 @@
             font-size: 18px;
             font-weight: bold;
         }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
     </style>
     <script>
         function aggiornaData() {
@@ -64,7 +79,35 @@
             });
             document.getElementById("data-aggiornamento").textContent = dataFormattata;
         }
-        window.onload = aggiornaData;
+
+        function caricaCSV() {
+            fetch('data.csv')
+                .then(response => response.text())
+                .then(data => {
+                    let lines = data.split('\n');
+                    let table = '<table><tr>';
+                    let headers = lines[0].split(',');
+                    for (let header of headers) {
+                        table += '<th>' + header + '</th>';
+                    }
+                    table += '</tr>';
+                    for (let i = 1; i < lines.length; i++) {
+                        let cells = lines[i].split(',');
+                        table += '<tr>';
+                        for (let cell of cells) {
+                            table += '<td>' + cell + '</td>';
+                        }
+                        table += '</tr>';
+                    }
+                    table += '</table>';
+                    document.getElementById('csv-table').innerHTML = table;
+                });
+        }
+
+        window.onload = function() {
+            aggiornaData();
+            caricaCSV();
+        };
     </script>
 </head>
 <body>
@@ -86,5 +129,7 @@
             <img src="Schema Dora.png" alt="Schema Prelievi">
         </div>
     </div>
+    <div id="csv-table"></div>
 </body>
 </html>
+```
