@@ -3,54 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabella Giornaliera</title>
+    <title>Monitoraggio Dora Baltea</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        table {
+        .container {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            max-width: 1000px;
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
         }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
+        .text-section {
+            width: 50%;
         }
-        th {
-            background-color: #f2f2f2;
+        .diagram {
+            width: 50%;
+            text-align: center;
+        }
+        .diagram img {
+            width: 100%;
+            max-width: 400px;
+        }
+        .data-box {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .number {
+            font-size: 20px;
+            font-weight: bold;
+            background-color: #007BFF;
+            color: white;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .value {
+            font-size: 18px;
+            font-weight: bold;
         }
     </style>
+    <script>
+        function aggiornaData() {
+            let oggi = new Date();
+            oggi.setDate(oggi.getDate() - 1); // Data di ieri
+            let dataFormattata = oggi.toLocaleDateString('it-IT', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            });
+            document.getElementById("data-aggiornamento").textContent = dataFormattata;
+        }
+        window.onload = aggiornaData;
+    </script>
 </head>
 <body>
-    <h2>Dati Aggiornati Giornalmente</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Località</th>
-                <th>13-feb</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Q med Tavagnasco</td>
-                <td>44,5</td>
-            </tr>
-            <tr>
-                <td>Q med Verolengo</td>
-                <td>39,5</td>
-            </tr>
-            <tr>
-                <td>Q med Depretis</td>
-                <td> - </td>
-            </tr>
-            <tr>
-                <td>Q med Naviglio d'Ivrea</td>
-                <td>6</td>
-            </tr>
-        </tbody>
-    </table>
+    <h2>Monitoraggio Prelievi Fluviali - Dati del <span id="data-aggiornamento"></span></h2>
+    <div class="container">
+        <div class="text-section">
+            <p>La pagina consente la consultazione della situazione delle portate e dei prelievi idrici lungo l'asta fluviale.</p>
+            <h3>Dati misurati</h3>
+            <div class="data-box"><div class="number">1</div> <div class="value">Portata in alveo Tavagnasco: 44,5</div></div>
+            <div class="data-box"><div class="number">2</div> <div class="value">Prelievo Montestrutto: -</div></div>
+            <div class="data-box"><div class="number">3</div> <div class="value">Prelievo Naviglio d'Ivrea: -</div></div>
+            <div class="data-box"><div class="number">4</div> <div class="value">Portata in alveo Ponte di Strambino: -</div></div>
+            <div class="data-box"><div class="number">5</div> <div class="value">Prelievo De Pretis: -</div></div>
+            <div class="data-box"><div class="number">6</div> <div class="value">Prelievo Canale Farini: -</div></div>
+            <div class="data-box"><div class="number">7</div> <div class="value">Portata in scaricatore Farini: -</div></div>
+            <div class="data-box"><div class="number">8</div> <div class="value">Portata in alveo Verolengo: 39,5</div></div>
+        </div>
+        <div class="diagram">
+            <img src="schema_prelievi.png" alt="Schema Prelievi">
+        </div>
+    </div>
 </body>
 </html>
