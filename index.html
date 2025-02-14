@@ -40,7 +40,29 @@
             width: 100%;
             height: 400px;
             border-radius: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
+        }
+        .legend {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+            font-size: 14px;
+            line-height: 18px;
+            color: #333;
+            width: 180px;
+        }
+        .legend div {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .legend span {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            margin-right: 10px;
+            border-radius: 50%;
         }
         table {
             width: 100%;
@@ -80,13 +102,18 @@
         <p>Tabella aggiornata ogni settimana con le ultime misurazioni.</p>
         
         <div id="map"></div>
+        <div class="legend">
+            <div><span style="background: blue;"></span> Portata in alveo</div>
+            <div><span style="background: green;"></span> Deflusso ecologico</div>
+            <div><span style="background: red;"></span> Prelievo</div>
+        </div>
         
         <table id="tabella-dati" class="display">
             <thead>
                 <tr>
                     <th>Sezione</th>
                     <th>Portata Media [m³/s]</th>
-                    <th>Posizione</th>
+                    <th>Tipo</th>
                 </tr>
             </thead>
             <tbody>
@@ -109,48 +136,21 @@
             attribution: '© Google Maps'
         }).addTo(map);
         
-        // Aggiunta di marker per i punti di controllo (esempio, da personalizzare)
+        var iconBlue = L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png', iconSize: [25, 41], iconAnchor: [12, 41] });
+        var iconGreen = L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png', iconSize: [25, 41], iconAnchor: [12, 41] });
+        var iconRed = L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png', iconSize: [25, 41], iconAnchor: [12, 41] });
+        
         var points = [
-            { name: "Verolengo", lat: 45.1912, lon: 7.9661 },
-            { name: "Tavagnasco", lat: 45.5583, lon: 7.8493 }
+            { name: "Tavagnasco", lat: 45.54793, lon: 7.82633, type: "portata in alveo" },
+            { name: "Verolengo", lat: 45.19199, lon: 8.040914, type: "portata in alveo" },
+            { name: "Scaricatore Farini", lat: 45.2208, lon: 8.009, type: "deflusso ecologico" },
+            { name: "Canale Depretis - Prelievo irriguo", lat: 45.2533, lon: 7.9983, type: "prelievo" }
         ];
         
         points.forEach(point => {
-            L.marker([point.lat, point.lon]).addTo(map)
-                .bindPopup(`<b>${point.name}</b>`);
+            var icon = point.type === "portata in alveo" ? iconBlue : point.type === "deflusso ecologico" ? iconGreen : iconRed;
+            L.marker([point.lat, point.lon], { icon: icon }).addTo(map).bindPopup(`<b>${point.name}</b><br>Tipo: ${point.type}`);
         });
-
-        $(document).ready(function() {
-            caricaTabella();
-        });
-        
-        function caricaTabella() {
-            $.get('data.csv', function(csvData) {
-                let rows = csvData.split("\n");
-                let tbody = "";
-                for (let i = 1; i < rows.length; i++) {
-                    let cols = rows[i].split(",");
-                    if (cols.length >= 2) {
-                        tbody += `<tr><td>${cols[0]}</td><td>${cols[1]}</td><td><div class='circle'>${i}</div></td></tr>`;
-                    }
-                }
-                $("#tabella-dati tbody").html(tbody);
-                $("#tabella-dati").DataTable();
-            });
-        }
-
-        function scaricaTabella() {
-            let csv = "Sezione,Portata Media\n";
-            $("#tabella-dati tbody tr").each(function() {
-                let cols = $(this).find("td");
-                csv += `${cols.eq(0).text()},${cols.eq(1).text()}\n`;
-            });
-            let blob = new Blob([csv], { type: 'text/csv' });
-            let link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "dati_monitoraggio.csv";
-            link.click();
-        }
     </script>
 </body>
 </html>
