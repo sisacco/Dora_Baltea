@@ -3,68 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoraggio Dora Baltea - Dati del <span id="data-aggiornamento"></span></title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <title>Monitoraggio Settimanale - Dora Baltea</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding: 20px;
         }
         .container {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
             max-width: 1000px;
             width: 100%;
-        }
-        .text-section {
-            width: 50%;
-        }
-        .diagram {
-            width: 50%;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
         }
-        .diagram img {
-            width: 100%;
-            max-width: 400px;
+        h2 {
+            color: #007BFF;
         }
         table {
             width: 100%;
-            margin-top: 20px;
             border-collapse: collapse;
+            margin-top: 20px;
         }
         th, td {
-            border: 1px solid black;
-            padding: 8px;
+            border: 1px solid #ddd;
+            padding: 12px;
             text-align: left;
         }
         th {
-            background-color: #f2f2f2;
-            position: sticky;
-            top: 0;
-            z-index: 1;
+            background-color: #007BFF;
+            color: white;
         }
-        td {
-            background-color: #fafafa;
-        }
-        tr:nth-child(even) td {
+        tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-        .circle {
-            background-color: deepskyblue;
-            color: white;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        button {
+        .btn-download {
             background-color: #007BFF;
             color: white;
             padding: 10px 20px;
@@ -72,55 +58,68 @@
             cursor: pointer;
             margin-top: 20px;
             border-radius: 5px;
+            font-size: 16px;
         }
-        button:hover {
+        .btn-download:hover {
             background-color: #0056b3;
         }
     </style>
-    <script>
-        function aggiornaData() {
-            let oggi = new Date();
-            oggi.setDate(oggi.getDate() - 1); // Data di ieri
-            let dataFormattata = oggi.toLocaleDateString('it-IT', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric'
-            });
-            document.getElementById("data-aggiornamento").textContent = dataFormattata;
-        }
-
-        function caricaTabella() {
-            Papa.parse('data.csv', {
-                download: true,
-                header: true,
-                complete: function(results) {
-                    let tabella = "<table><thead><tr><th>Sezione</th><th>Portata Media [m³/s]</th><th>Posizione</th></tr></thead><tbody>";
-                    results.data.forEach(function(row, index) {
-                        tabella += "<tr><td>" + row['Sezione'] + "</td><td>" + row['Portata Media'] + "</td><td><div class='circle'>" + (index + 1) + "</div></td></tr>";
-                    });
-                    tabella += "</tbody></table>";
-                    document.getElementById('tabella-dati').innerHTML = tabella;
-                }
-            });
-        }
-
-        window.onload = function() {
-            aggiornaData();
-            caricaTabella();
-        };
-    </script>
 </head>
 <body>
-    <h2>Monitoraggio Dora Baltea - Dati del <span id="data-aggiornamento"></span></h2>
     <div class="container">
-        <div class="text-section">
-            <p>La pagina consente la consultazione della situazione delle portate e dei prelievi idrici lungo l'asta fluviale.</p>
-            <div id="tabella-dati"></div>
-        </div>
-        <div class="diagram">
-            <img src="schema_prelievi.png" alt="schema_prelievi.png">
-        </div>
+        <h2>Monitoraggio Settimanale - Dora Baltea</h2>
+        <p>Tabella aggiornata ogni settimana con le ultime misurazioni.</p>
+        <table id="tabella-dati" class="display">
+            <thead>
+                <tr>
+                    <th>Sezione</th>
+                    <th>Portata Media [m³/s]</th>
+                    <th>Posizione</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- I dati verranno caricati dinamicamente -->
+            </tbody>
+        </table>
+        <button class="btn-download" onclick="scaricaTabella()">Scarica CSV</button>
     </div>
-    <button onclick="scaricaTabella()">Scarica Tabella</button>
+    
+    <!-- jQuery e DataTables -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            caricaTabella();
+        });
+        
+        function caricaTabella() {
+            $.get('data.csv', function(csvData) {
+                let rows = csvData.split("\n");
+                let tbody = "";
+                for (let i = 1; i < rows.length; i++) {
+                    let cols = rows[i].split(",");
+                    if (cols.length >= 2) {
+                        tbody += `<tr><td>${cols[0]}</td><td>${cols[1]}</td><td><div class='circle'>${i}</div></td></tr>`;
+                    }
+                }
+                $("#tabella-dati tbody").html(tbody);
+                $("#tabella-dati").DataTable();
+            });
+        }
+
+        function scaricaTabella() {
+            let csv = "Sezione,Portata Media\n";
+            $("#tabella-dati tbody tr").each(function() {
+                let cols = $(this).find("td");
+                csv += `${cols.eq(0).text()},${cols.eq(1).text()}\n`;
+            });
+            let blob = new Blob([csv], { type: 'text/csv' });
+            let link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "dati_monitoraggio.csv";
+            link.click();
+        }
+    </script>
 </body>
 </html>
