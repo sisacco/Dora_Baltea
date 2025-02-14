@@ -1,12 +1,10 @@
-To display the CSV data in a table on your web page, you can use JavaScript to fetch the CSV file and create an HTML table. Here is an updated version of your `index.html` file with the necessary code:
-
-```html
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoraggio Prelievi Fluviali</title>
+    <title>Monitoraggio Prelievi Fluviali - Dati del <span id="data-aggiornamento"></span></title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -33,39 +31,50 @@ To display the CSV data in a table on your web page, you can use JavaScript to f
             width: 100%;
             max-width: 400px;
         }
-        .data-box {
-            display: flex;
-            align-items: center;
-            margin: 10px 0;
-        }
-        .number {
-            font-size: 20px;
-            font-weight: bold;
-            background-color: #007BFF;
-            color: white;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 50%;
-            margin-right: 10px;
-        }
-        .value {
-            font-size: 18px;
-            font-weight: bold;
-        }
         table {
             width: 100%;
-            border-collapse: collapse;
             margin-top: 20px;
-        }
-        table, th, td {
-            border: 1px solid black;
+            border-collapse: collapse;
         }
         th, td {
-            padding: 10px;
+            border: 1px solid black;
+            padding: 8px;
             text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        td {
+            background-color: #fafafa;
+        }
+        tr:nth-child(even) td {
+            background-color: #f9f9f9;
+        }
+        .circle {
+            background-color: deepskyblue;
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
         }
     </style>
     <script>
@@ -80,33 +89,24 @@ To display the CSV data in a table on your web page, you can use JavaScript to f
             document.getElementById("data-aggiornamento").textContent = dataFormattata;
         }
 
-        function caricaCSV() {
-            fetch('data.csv')
-                .then(response => response.text())
-                .then(data => {
-                    let lines = data.split('\n');
-                    let table = '<table><tr>';
-                    let headers = lines[0].split(',');
-                    for (let header of headers) {
-                        table += '<th>' + header + '</th>';
-                    }
-                    table += '</tr>';
-                    for (let i = 1; i < lines.length; i++) {
-                        let cells = lines[i].split(',');
-                        table += '<tr>';
-                        for (let cell of cells) {
-                            table += '<td>' + cell + '</td>';
-                        }
-                        table += '</tr>';
-                    }
-                    table += '</table>';
-                    document.getElementById('csv-table').innerHTML = table;
-                });
+        function caricaTabella() {
+            Papa.parse('data.csv', {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    let tabella = "<table><thead><tr><th>Sezione</th><th>Portata Media [m³/s]</th><th>Posizione</th></tr></thead><tbody>";
+                    results.data.forEach(function(row, index) {
+                        tabella += "<tr><td>" + row['Sezione'] + "</td><td>" + row['Portata Media'] + "</td><td><div class='circle'>" + (index + 1) + "</div></td></tr>";
+                    });
+                    tabella += "</tbody></table>";
+                    document.getElementById('tabella-dati').innerHTML = tabella;
+                }
+            });
         }
 
         window.onload = function() {
             aggiornaData();
-            caricaCSV();
+            caricaTabella();
         };
     </script>
 </head>
@@ -115,21 +115,12 @@ To display the CSV data in a table on your web page, you can use JavaScript to f
     <div class="container">
         <div class="text-section">
             <p>La pagina consente la consultazione della situazione delle portate e dei prelievi idrici lungo l'asta fluviale.</p>
-            <h3>Dati misurati</h3>
-            <div class="data-box"><div class="number">1</div> <div class="value">Portata in alveo Tavagnasco: 44,5</div></div>
-            <div class="data-box"><div class="number">2</div> <div class="value">Prelievo Montestrutto: -</div></div>
-            <div class="data-box"><div class="number">3</div> <div class="value">Prelievo Naviglio d'Ivrea: -</div></div>
-            <div class="data-box"><div class="number">4</div> <div class="value">Portata in alveo Ponte di Strambino: -</div></div>
-            <div class="data-box"><div class="number">5</div> <div class="value">Prelievo De Pretis: -</div></div>
-            <div class="data-box"><div class="number">6</div> <div class="value">Prelievo Canale Farini: -</div></div>
-            <div class="data-box"><div class="number">7</div> <div class="value">Portata in scaricatore Farini: -</div></div>
-            <div class="data-box"><div class="number">8</div> <div class="value">Portata in alveo Verolengo: 39,5</div></div>
+            <div id="tabella-dati"></div>
         </div>
         <div class="diagram">
             <img src="Schema Dora.png" alt="Schema Prelievi">
         </div>
     </div>
-    <div id="csv-table"></div>
+    <button onclick="scaricaTabella()">Scarica Tabella</button>
 </body>
 </html>
-```
