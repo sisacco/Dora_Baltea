@@ -141,6 +141,29 @@
             L.marker([point.lat, point.lon], { icon: icons[point.type] }).addTo(map)
                 .bindPopup(`<b>${point.name}</b><br>Tipo: ${point.type}`);
         });
+        function caricaTabella() {
+            $.get('data.csv', function(csvData) {
+                let rows = csvData.split("\n");
+                let tbody = "";
+                for (let i = 1; i < rows.length; i++) {
+                    let cols = rows[i].split(",");
+                    if (cols.length >= 7) {
+                        tbody += `<tr>
+                            <td>${cols[0]}</td>
+                            <td>${cols[1]}</td>
+                            <td>${cols[2]}</td>
+                            <td>${cols[3]}</td>
+                            <td>${cols[4]}</td>
+                            <td>${cols[5]}</td>
+                            <td>${cols[6]}</td>
+                            <td>${cols[7]}</td>
+                        </tr>`;
+                    }
+                }
+                $("#tabella-dati tbody").html(tbody);
+                $("#tabella-dati").DataTable();
+            });
+        }
     </script>
 </body>
 </html>
