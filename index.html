@@ -177,10 +177,19 @@ $(document).ready(function() {
             $.get('data.csv', function(csvData) {
                 let rows = csvData.split("\n");
                 let tbody = "";
-                for (let i = 1; i < rows.length; i++) {
+               for (let i = 1; i < rows.length; i++) {
                     let cols = rows[i].split(",");
-                    if (cols.length >= 2) {
-                        tbody += `<tr><td>${cols[0]}</td><td>${cols[1]}</td><td><div class='circle'>${i}</div></td></tr>`;
+                    if (cols.length >= 7) {
+                        tbody += `<tr>
+                            <td>${cols[0]}</td>
+                            <td>${cols[1]}</td>
+                            <td>${cols[2]}</td>
+                            <td>${cols[3]}</td>
+                            <td>${cols[4]}</td>
+                            <td>${cols[5]}</td>
+                            <td>${cols[6]}</td>
+                            <td>${cols[7]}</td>
+                        </tr>`;
                     }
                 }
                 $("#tabella-dati tbody").html(tbody);
