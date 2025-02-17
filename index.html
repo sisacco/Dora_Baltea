@@ -141,13 +141,18 @@
             L.marker([point.lat, point.lon], { icon: icons[point.type] }).addTo(map)
                 .bindPopup(`<b>${point.name}</b><br>Tipo: ${point.type}`);
         });
+
+        $(document).ready(function() {
+            caricaTabella();
+        });
+
         function caricaTabella() {
             $.get('data.csv', function(csvData) {
                 let rows = csvData.split("\n");
                 let tbody = "";
                 for (let i = 1; i < rows.length; i++) {
                     let cols = rows[i].split(",");
-                    if (cols.length >= 7) {
+                    if (cols.length >= 8) {
                         tbody += `<tr>
                             <td>${cols[0]}</td>
                             <td>${cols[1]}</td>
@@ -162,6 +167,18 @@
                 }
                 $("#tabella-dati tbody").html(tbody);
                 $("#tabella-dati").DataTable();
+            });
+        }
+
+        function scaricaCSV() {
+            $.get('data.csv', function(data) {
+                let blob = new Blob([data], { type: 'text/csv' });
+                let link = document.createElement("a");
+                link.href = window.URL.createObjectURL(blob);
+                link.download = "dati_monitoraggio.csv";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             });
         }
     </script>
