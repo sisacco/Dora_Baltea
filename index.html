@@ -196,6 +196,17 @@ $(document).ready(function() {
                 $("#tabella-dati").DataTable();
             });
         }
+        function scaricaCSV() {
+            $.get('https://raw.githubusercontent.com/NOME-UTENTE/NOME-REPO/main/data.csv', function(data) {
+                let blob = new Blob([data], { type: 'text/csv' });
+                let link = document.createElement("a");
+                link.href = window.URL.createObjectURL(blob);
+                link.download = "dati_monitoraggio.csv";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+        }
     </script>
 </body>
 </html>
