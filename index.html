@@ -197,7 +197,7 @@ $(document).ready(function() {
             });
         }
         function scaricaCSV() {
-            $.get('https://raw.githubusercontent.com/NOME-UTENTE/NOME-REPO/main/data.csv', function(data) {
+            $.get('https://raw.githubusercontent.com/sisacco/Dora_Baltea/refs/heads/main/data.csv', function(data) {
                 let blob = new Blob([data], { type: 'text/csv' });
                 let link = document.createElement("a");
                 link.href = window.URL.createObjectURL(blob);
